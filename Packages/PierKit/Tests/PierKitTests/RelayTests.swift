@@ -194,7 +194,7 @@ final class ServerByteStream: ChannelDuplexHandler, @unchecked Sendable {
         #expect(dial.negotiatedProtocol == "http/1.1")
         let c = dial.channel
         let exported = try await c.eventLoop.submit {
-            try c.pipeline.syncOperations.nioSSL_exportKeyingMaterial(label: Pairing.exporterLabel, length: 32)
+            try TLSDial.boxTLS(c.pipeline.syncOperations).exportKeyingMaterial(label: Pairing.exporterLabel, length: 32)
         }.get()
         try await Task.sleep(for: .milliseconds(200))
         #expect(holder.lock.withLockedValue { $0 } == exported)
@@ -238,7 +238,7 @@ final class ServerByteStream: ChannelDuplexHandler, @unchecked Sendable {
         #expect(dial.negotiatedProtocol == "http/1.1")
         let c = dial.channel
         let exported = try await c.eventLoop.submit {
-            try c.pipeline.syncOperations.nioSSL_exportKeyingMaterial(label: Pairing.exporterLabel, length: 32)
+            try TLSDial.boxTLS(c.pipeline.syncOperations).exportKeyingMaterial(label: Pairing.exporterLabel, length: 32)
         }.get()
         try await Task.sleep(for: .milliseconds(200))
         #expect(holder.lock.withLockedValue { $0 } == exported)

@@ -91,7 +91,7 @@ public enum Pairing {
         }
 
         let exporter = try await channel.eventLoop.submit {
-            try channel.pipeline.syncOperations.nioSSL_exportKeyingMaterial(label: exporterLabel, length: 32)
+            try TLSDial.boxTLS(channel.pipeline.syncOperations).exportKeyingMaterial(label: exporterLabel, length: 32)
         }.get()
         let proof = PierIdentity.pairingProof(code: link.code, exporter: exporter, clientFingerprint: identity.fingerprint)
 

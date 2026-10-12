@@ -237,6 +237,14 @@ enum TLSDial {
         let negotiatedProtocol: String?
     }
 
+    private static let boxTLSName = "pier-box-tls"
+
+    /// The TLS to the box, by name: through a `wss://` relay the pipeline's first NIOSSLHandler is the front's.
+    static func boxTLS(_ ops: ChannelPipeline.SynchronousOperations) throws -> NIOSSLHandler {
+        guard let tls = try ops.context(name: boxTLSName).handler as? NIOSSLHandler else { throw PierError.tls("no TLS to the box") }
+        return tls
+    }
+
     static func connect(
         host: String,
         port: Int,
@@ -333,7 +341,7 @@ enum TLSDial {
                         promise.succeed(.failed)
                     }
                 })
-            try ops.addHandler(ssl)
+            try ops.addHandler(ssl, name: boxTLSName)
             try ops.addHandler(HandshakeWaiter(promise: handshake))
             try configure(ops)
         }
